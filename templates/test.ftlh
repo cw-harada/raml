@@ -3,7 +3,7 @@
   <title>Welcome!</title>
 </head>
 <body>
-  <h1>Welcome ${user}!</h1>
-  <p>Our latest product:
+  <p>Our latest</p>
+    <a href="${product.url()}">${product.name()}</a>!
 </body>
 </html>
