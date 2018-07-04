@@ -4,9 +4,13 @@ import freemarker.template.{Configuration, Template, TemplateExceptionHandler}
 import model.Product
 
 object Main extends App {
+  val ramlDirectory = new File(".").getCanonicalPath + "/raml"
+
+  RamlParser.parse(new File(ramlDirectory + "/input.raml"))
+
 
   val cfg = new Configuration(Configuration.VERSION_2_3_27)
-  val templateDirectory = new java.io.File(".").getCanonicalPath + "/templates"
+  val templateDirectory = new File(".").getCanonicalPath + "/templates"
   cfg.setDirectoryForTemplateLoading(new File(templateDirectory))
   cfg.setDefaultEncoding("UTF-8")
   cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER)
