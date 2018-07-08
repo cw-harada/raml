@@ -1,23 +1,26 @@
 #%RAML 1.0
-title: Hello world # required title
-
-/helloworld: # optional resource
-  get: # HTTP method declaration
-    responses: # declare a response
-      200: # HTTP status code
-        body: # declare content of response
-          application/json: # media type
-            type: | # structural definition of a response (schema or type)
-              {
-                "title": "Hello world Response",
-                "type": "object",
-                "properties": {
-                  "message": {
-                    "type": "string"
-                  }
-                }
-              }
-            example: | # example of how a response looks
-              {
-                "message": "Hello world"
-              }
+title: chatwork API
+version: v2
+baseUri: https://api.chatwork.com/
+/job:
+  get:
+    displayName: getJob
+    description: get the job
+    queryParameters:
+      job_id:
+        description: Specify the jon id
+        type:        integer
+        minimum:     1
+        maximum:     200
+        default:     30
+        example:     50
+  post:
+    displayName: createJob
+    description: create a new job
+    body:
+      application/json:
+        type: |
+          {
+            "id" : 5,
+            "name" : "new job name"
+          }
