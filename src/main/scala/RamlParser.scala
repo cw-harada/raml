@@ -12,13 +12,6 @@ object RamlParser {
     val ramlModelResult: RamlModelResult = new RamlModelBuilder().buildApi(input)
     if (ramlModelResult.hasErrors()) {
       val arrayList = ramlModelResult.getValidationResults
-      /*
-      for (validationResult: ValidationResult <- arrayList.asScala)
-      {
-        //throw new Exception(validationResult.getMessage)
-        //validationResult.getMessage()
-      }
-      */
       throw new Exception(arrayList.asScala.head.getMessage)
     } else {
       ramlModelResult
