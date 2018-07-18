@@ -1,6 +1,8 @@
 import java.io.{File, FileOutputStream, OutputStreamWriter, Writer}
 
+import com.sun.org.apache.bcel.internal.generic.ObjectType
 import freemarker.template.{Configuration, Template, TemplateExceptionHandler}
+import org.raml.v2.api.model.v10.datamodel.{ObjectTypeDeclaration, TypeDeclaration}
 
 import scala.collection.JavaConverters._
 
@@ -8,6 +10,21 @@ object Main extends App {
   val ramlDirectory = new File(".").getCanonicalPath + "/raml"
 
   val ramlModelResult = RamlParser.parse(new File(ramlDirectory + "/input.raml"))
+
+  val resources = ramlModelResult.getApiV10().resources().asScala
+  val tt = ramlModelResult.getApiV10.types().get(0)
+  for (r <- resources) {
+    for (r2 <- r.resources.asScala) {
+      for (method <- r2.methods().asScala) {
+        for (response <- method.responses().asScala) {
+          for (body <- response.body().asScala) {
+            for (facet <- body.facets().asScala) {
+            }
+          }
+        }
+      }
+    }
+  }
 
   val cfg = new Configuration(Configuration.VERSION_2_3_27)
   val templateDirectory = new File(".").getCanonicalPath + "/templates"
@@ -17,18 +34,40 @@ object Main extends App {
   cfg.setLogTemplateExceptions(false)
   cfg.setWrapUncheckedExceptions(true)
 
-  val temp: Template = cfg.getTemplate("test.ftlh")
-
   val root: java.util.HashMap[String, Object] = new java.util.HashMap[String, Object]
+  createCaseClass()
+  createApiClient()
 
-  root.put("raml", ramlModelResult)
+  //val out: Writer = new OutputStreamWriter(System.out)
 
-  val out: Writer = new OutputStreamWriter(System.out)
-  temp.process(root, out)
+  def createCaseClass() = {
 
-  val outputDirectory = new File(".").getCanonicalPath + "/output"
-  val fileOutPutStream = new FileOutputStream(outputDirectory + "/Client.scala")
-  val outFile: Writer = new OutputStreamWriter(fileOutPutStream)
-  temp.process(root, outFile)
+    val types = ramlModelResult.getApiV10.types().asScala
+    var dataTypes = List[ObjectTypeDeclaration]()
+    for (i <- types) {
+      dataTypes :+= i.asInstanceOf[ObjectTypeDeclaration]
+    }
+    val caseClassTemplate: Template = cfg.getTemplate("case_class.ftlh")
+    root.put("dataTypes", dataTypes.asJava)
+    // caseClassTemplate.process(root, out)
+
+    outputFile("Model.scala", caseClassTemplate)
+  }
+
+  def createApiClient() = {
+
+    val apiClientTemplate: Template = cfg.getTemplate("api_client.ftlh")
+    root.put("raml", ramlModelResult)
+    //apiClientTemplate.process(root, out)
+
+    outputFile("Client.scala", apiClientTemplate)
+  }
+
+  def outputFile(outputPath: String, template: Template) = {
+    val outputDirectory = new File(".").getCanonicalPath + "/src/main/scala/output"
+    val fileOutPutStream = new FileOutputStream(outputDirectory + "/" + outputPath)
+    val outFile: Writer = new OutputStreamWriter(fileOutPutStream)
+    template.process(root, outFile)
+  }
 
 }

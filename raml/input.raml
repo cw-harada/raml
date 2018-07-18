@@ -1,26 +1,88 @@
 #%RAML 1.0
 title: chatwork API
+mediaType: [ application/json ]
 version: v2
 baseUri: https://api.chatwork.com/
-/job:
+traits:
+  secured:
+    headers:
+      X-ChatWorkToken:
+        type: string
+        description: chatwork token
+
+types:
+  Room:
+    properties:
+      room_id: integer
+      name: string
+      type: string
+      role: string
+      sticky: boolean
+      unread_num: integer
+      mention_num: integer
+      mytask_num: integer
+      message_num: integer
+      file_num: integer
+      task_num: integer
+      icon_path: string
+      last_update_time: integer
+  Message:
+    properties:
+      message_id: string
+  RoomId:
+    properties:
+      room_id: integer
+/rooms:
   get:
-    displayName: getJob
-    description: get the job
-    queryParameters:
-      job_id:
-        description: Specify the jon id
-        type:        integer
-        minimum:     1
-        maximum:     200
-        default:     30
-        example:     50
-  post:
-    displayName: createJob
-    description: create a new job
-    body:
-      application/json:
-        type: |
-          {
-            "id" : 5,
-            "name" : "new job name"
-          }
+     displayName: getRooms
+     description: get rooms
+     headers:
+       X-ChatWorkToken:
+     responses:
+       200:
+         body: Room[]
+  #/{roomId}:
+  #  uriParameters:
+  #    roomId:
+  #      type: integer
+  #  get:
+  #    displayName: getRoom
+  #    description: get room
+  #    responses:
+  #      200:
+  #        body: Room
+  #  put:
+  #    displayName: updateRoom
+  #    description: update room
+  #    body:
+  #      application/x-www-form-urlencoded:
+  #        properties:
+  #          description:
+  #            description: title of room
+  #            required: false
+  #            type: string
+  #          icon_preset:
+  #            description: icon preset of room
+  #            required: false
+  #            type: string
+  #          name:
+  #            description: name of room
+  #            required: false
+  #            type: string
+  #    responses:
+  #      200:
+  #        body: RoomId
+  #  /messages:
+  #    post:
+  #      displayName: postMessage
+  #      description: post message to room
+  #      body:
+  #        application/x-www-form-urlencoded:
+  #          properties:
+  #            message:
+  #              description: message posted to room
+  #              required: true
+  #              type: string
+  #      responses:
+  #        200:
+  #          body: Message
