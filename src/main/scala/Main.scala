@@ -1,8 +1,7 @@
 import java.io.{File, FileOutputStream, OutputStreamWriter, Writer}
 
-import com.sun.org.apache.bcel.internal.generic.ObjectType
 import freemarker.template.{Configuration, Template, TemplateExceptionHandler}
-import org.raml.v2.api.model.v10.datamodel.{ObjectTypeDeclaration, TypeDeclaration}
+import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration
 
 import scala.collection.JavaConverters._
 
