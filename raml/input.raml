@@ -41,16 +41,16 @@ types:
      responses:
        200:
          body: Room[]
-  #/{roomId}:
-  #  uriParameters:
-  #    roomId:
-  #      type: integer
-  #  get:
-  #    displayName: getRoom
-  #    description: get room
-  #    responses:
-  #      200:
-  #        body: Room
+  /{roomId}:
+    uriParameters:
+      roomId:
+        type: integer
+    get:
+      displayName: getRoom
+      description: get room
+      responses:
+        200:
+          body: Room
   #  put:
   #    displayName: updateRoom
   #    description: update room

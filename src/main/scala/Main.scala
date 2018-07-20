@@ -11,21 +11,6 @@ object Main extends App {
 
   val ramlModelResult = RamlParser.parse(new File(ramlDirectory + "/input.raml"))
 
-  val resources = ramlModelResult.getApiV10().resources().asScala
-  val tt = ramlModelResult.getApiV10.types().get(0)
-  for (r <- resources) {
-    for (r2 <- r.resources.asScala) {
-      for (method <- r2.methods().asScala) {
-        for (response <- method.responses().asScala) {
-          for (body <- response.body().asScala) {
-            for (facet <- body.facets().asScala) {
-            }
-          }
-        }
-      }
-    }
-  }
-
   val cfg = new Configuration(Configuration.VERSION_2_3_27)
   val templateDirectory = new File(".").getCanonicalPath + "/templates"
   cfg.setDirectoryForTemplateLoading(new File(templateDirectory))
@@ -38,8 +23,6 @@ object Main extends App {
   createCaseClass()
   createApiClient()
 
-  //val out: Writer = new OutputStreamWriter(System.out)
-
   def createCaseClass() = {
 
     val types = ramlModelResult.getApiV10.types().asScala
@@ -49,7 +32,6 @@ object Main extends App {
     }
     val caseClassTemplate: Template = cfg.getTemplate("case_class.ftlh")
     root.put("dataTypes", dataTypes.asJava)
-    // caseClassTemplate.process(root, out)
 
     outputFile("Model.scala", caseClassTemplate)
   }
@@ -58,7 +40,6 @@ object Main extends App {
 
     val apiClientTemplate: Template = cfg.getTemplate("api_client.ftlh")
     root.put("raml", ramlModelResult)
-    //apiClientTemplate.process(root, out)
 
     outputFile("Client.scala", apiClientTemplate)
   }

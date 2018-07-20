@@ -1,6 +1,4 @@
 import com.softwaremill.sttp._
-import com.softwaremill.sttp._
-import com.typesafe.config.{Config, ConfigFactory}
 import org.json4s._
 import org.json4s.native.JsonMethods._
 
@@ -34,9 +32,30 @@ class ApiClient() {
       </#if>
     </#list>
   </#list>
-</#list>
   }
 
+  <#list resource.resources() as resource2>
+    <#list resource2.methods() as method>
+    <#if resource2.relativeUri().value() != "">
+      <#list resource2.uriParameters() as params>
+        <#assign uriParamName = params.name()>
+        <#assign uriParam = params.name() + ": " + params.type()?cap_first>
+      </#list>
+    </#if>
+  def ${method.displayName().value()}(<#if uriParam??>${uriParam}</#if>) = {
+      <#if method.method() == "get">
+    val relativePath = "${resource.relativeUri().value()}" <#if uriParamName??> + ${uriParamName}</#if>
+    val response = getRequest(relativePath)
+      <#elseif method.method() == "post">
+        <#list method.body() as body>
+          () = {
+            val response = sttp.post(baseUri).body(${body.type()?no_esc}).send();
+        </#list>
+      </#if>
+  }
+    </#list>
+  </#list>
+</#list>
 
   def getRequest(relativePath: String = "") = {
     val path = baseUri + version + relativePath
@@ -69,23 +88,4 @@ class ApiClient() {
     }
   }
 
-  <#--
-  <#list resource.resources() as resource2>
-    <#list resource2.methods() as method>
-      // ${method.description().value()}
-      def ${method.displayName().value()}(<@compress single_line=true>
-      <#if method.method() == "get">
-        <#list method.queryParameters() as param>
-          ${param.name()}: ${param.type()?cap_first}<#if param.defaultValue()??> = ${param.defaultValue()}</#if><#if param_has_next>,</#if></#list>) = {}
-      <#elseif method.method() == "post">
-        <#list method.body() as body>
-          () = {
-            val response = sttp.post(baseUri).body(${body.type()?no_esc}).send();
-          }
-        </#list>
-      </#if>
-      </@compress>
-    </#list>
-  </#list>
-  -->
 }
